@@ -6,7 +6,7 @@ import java.text.ParseException;
 
 public class IntervalRule {
     @JsonProperty("from")
-    public String from;
+    public Object from;
 
     @JsonProperty("to")
     public Object to;
@@ -18,7 +18,7 @@ public class IntervalRule {
     private final boolean rightOpen;
 
     IntervalRule() throws ParseException {
-        String interval = from.replaceAll("\\s+", "");
+        String interval = from.toString().replaceAll("\\s+", "");
         if (interval.length() < 5) {
             throw new ParseException("unexpected lenght of interval", interval.length());
         }
