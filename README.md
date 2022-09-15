@@ -12,3 +12,4 @@ Reads values and maps them to other values using a configuration map. Any values
 
 ## Configs
 * rules (String): A JSON encoded rule list. No two rules may use the same from value. Example: [{"from": 12, "to": false}]
+* intervalRules (String): A JSON encoded interval rule list. Interval rules will be checked secondary to rules. Example: [{"from": "(12, 150]", "to": false}]

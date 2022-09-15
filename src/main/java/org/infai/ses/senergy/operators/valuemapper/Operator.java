@@ -36,7 +36,11 @@ public class Operator {
             map.put(r.from, r.to);
         }
 
+        TypeReference<IntervalRule[]> typeRefInterval = new TypeReference<>() {
+        };
+        IntervalRule[] intervalRules = mapper.readValue(new Config().getConfigValue("intervalRules", "[]"), typeRefInterval);
+
         Stream stream = new Stream();
-        stream.start(new Valuemapper(map));
+        stream.start(new Valuemapper(map, intervalRules));
     }
 }

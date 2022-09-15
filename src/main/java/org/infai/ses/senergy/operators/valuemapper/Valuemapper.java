@@ -16,37 +16,23 @@
 
 package org.infai.ses.senergy.operators.valuemapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.streams.StreamsConfig;
 import org.infai.ses.senergy.exceptions.NoValueException;
-import org.infai.ses.senergy.models.AnalyticsMessageModel;
-import org.infai.ses.senergy.models.MessageModel;
 import org.infai.ses.senergy.operators.BaseOperator;
 import org.infai.ses.senergy.operators.FlexInput;
-import org.infai.ses.senergy.operators.Helper;
 import org.infai.ses.senergy.operators.Message;
-import org.infai.ses.senergy.utils.StreamsConfigProvider;
-import org.infai.ses.senergy.utils.TimeProvider;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 public class Valuemapper extends BaseOperator {
 
     private final Map translation;
+    private final IntervalRule[] intervalRules;
 
 
-    public Valuemapper(Map translation) {
+    public Valuemapper(Map translation, IntervalRule[] intervalRules) {
         this.translation = translation;
+        this.intervalRules = intervalRules;
     }
 
     @Override
@@ -54,11 +40,21 @@ public class Valuemapper extends BaseOperator {
         FlexInput valueInput = message.getFlexInput("value");
         try {
             final Object value = valueInput.getValue(Object.class);
-            final Object output;
+            Object output = null;
             if (translation.containsKey(value)) {
                 output = translation.get(value);
             } else {
-                output = value;
+                boolean matched = false;
+                for (IntervalRule intervalRule : intervalRules) {
+                    if (intervalRule.triggers(value)) {
+                        output = intervalRule.to;
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    output = value;
+                }
             }
             message.output("value", output);
         } catch (NoValueException e) {
