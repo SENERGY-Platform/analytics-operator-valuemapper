@@ -21,6 +21,7 @@ import org.infai.ses.senergy.operators.BaseOperator;
 import org.infai.ses.senergy.operators.FlexInput;
 import org.infai.ses.senergy.operators.Message;
 
+import java.text.ParseException;
 import java.util.Map;
 
 
@@ -57,7 +58,7 @@ public class Valuemapper extends BaseOperator {
                 }
             }
             message.output("value", output);
-        } catch (NoValueException e) {
+        } catch (NoValueException | ParseException e) {
             e.printStackTrace();
         }
     }

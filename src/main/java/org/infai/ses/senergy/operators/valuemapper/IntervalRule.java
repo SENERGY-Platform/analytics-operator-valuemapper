@@ -12,12 +12,15 @@ public class IntervalRule {
     public Object to;
 
 
-    private final double min;
-    private final double max;
-    private final boolean leftOpen;
-    private final boolean rightOpen;
+    private double min;
+    private double max;
+    private boolean leftOpen;
+    private boolean rightOpen;
 
-    IntervalRule() throws ParseException {
+    private boolean initialized = false;
+
+    protected void init() throws ParseException {
+        initialized = true;
         String interval = from.toString().replaceAll("\\s+", "");
         if (interval.length() < 5) {
             throw new ParseException("unexpected lenght of interval", interval.length());
@@ -68,7 +71,10 @@ public class IntervalRule {
         }
     }
 
-    public boolean triggers(Object value) {
+    public boolean triggers(Object value) throws ParseException {
+        if (!initialized) {
+            init();
+        }
         if (value instanceof Integer) {
             value = ((Integer) value).doubleValue();
         }
